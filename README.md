@@ -66,8 +66,11 @@ python train.py --gpu 0
 
 ## Gen density map for custom dataset
 open tool/preapre_JHUCROWD.m file
+
 replace path and output_path to your corresponding path
+
 run the file in Octave
+
 download Octave here: https://www.gnu.org/software/octave/download
 
 ## Citation
