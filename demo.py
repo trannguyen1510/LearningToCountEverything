@@ -1,11 +1,3 @@
-"""
-Demo file for Few Shot Counting
-
-By: Minh Hoai Nguyen (minhhoai@cs.stonybrook.edu)
-Created: 19-Apr-2021
-Last modified: 19-Apr-2021
-"""
-
 import cv2
 from model import CountRegressor, Resnet50FPN
 from utils import MAPS, Scales, Transform, extract_features
@@ -72,7 +64,7 @@ if args.bbox_file is None: # if no bounding box file is given, prompt the user f
         fout.write("{} {} {} {}\n".format(y1, x1, y2, x2))
 
     fout.close()
-    cv2.destroyWindow("Image")
+    cv2.destroyWindow("image")
     print("selected bounding boxes are saved to {}".format(out_bbox_file))
 else:
     with open(args.bbox_file, "r") as fin:
@@ -89,6 +81,8 @@ else:
 
 print("Bounding boxes: ", end="")
 print(rects1)
+
+quit()
 
 image = Image.open(args.input_image)
 image.load()
@@ -137,5 +131,3 @@ print('===> The predicted count is: {:6.2f}'.format(output.sum().item()))
 rslt_file = "{}/{}_out.png".format(args.output_dir, image_name)
 visualize_output_and_save(image.detach().cpu(), output.detach().cpu(), boxes.cpu(), rslt_file)
 print("===> Visualized output is saved to {}".format(rslt_file))
-
-
