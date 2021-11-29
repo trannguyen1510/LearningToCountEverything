@@ -64,6 +64,9 @@ python test.py --data_path /PATH/TO/YOUR/FSC147/DATASET/ --test_split val --adap
 python train.py --gpu 0
 ```
 
+## Gen density map for custom dataset
+run tool/get_density_map_gaussian.m in Octave
+
 ## Citation
 
 If you find the code useful, please cite:
