@@ -30,6 +30,10 @@ python -m pip install matplotlib opencv-python notebook tqdm
 
 conda install pytorch==1.4.0 torchvision==0.5.0 cudatoolkit=10.0 -c pytorch
 
+## Run with docker file
+- Build dockerfile `docker build -t cvlab/cvcount .`
+- Run image `docker run --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=0,1 -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -ti -v $PWD:/workdir cvlab/cvcount`
+- Type `bash --login` in docker terminal
 
 ## Quick demo
 
@@ -63,6 +67,15 @@ python test.py --data_path /PATH/TO/YOUR/FSC147/DATASET/ --test_split val --adap
 ``` bash
 python train.py --gpu 0
 ```
+
+## Gen density map for custom dataset
+open tool/preapre_JHUCROWD.m file
+
+replace path and output_path to your corresponding path
+
+run the file in Octave
+
+download Octave here: https://www.gnu.org/software/octave/download
 
 ## Citation
 
