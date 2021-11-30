@@ -31,11 +31,17 @@ parser.add_argument("-lr", "--learning-rate", type=float,default=1e-5, help="lea
 args = parser.parse_args()
 
 
+# data_path = args.data_path
+# anno_file = data_path + 'annotation_FSC147_384.json'
+# data_split_file = data_path + 'Train_Test_Val_FSC_147.json'
+# im_dir = data_path + 'images_384_VarV2'
+# gt_dir = data_path + 'gt_density_map_adaptive_384_VarV2'
+
 data_path = args.data_path
-anno_file = data_path + 'annotation_FSC147_384.json'
-data_split_file = data_path + 'Train_Test_Val_FSC_147.json'
-im_dir = data_path + 'images_384_VarV2'
-gt_dir = data_path + 'gt_density_map_adaptive_384_VarV2'
+anno_file = os.path.join(data_path, 'annotation.json')
+data_split_file = data_path + 'Train_Test_Val.json'
+im_dir = data_path + 'image'
+gt_dir = os.path.join(data_path, 'den')
 
 if not exists(args.output_dir):
     os.mkdir(args.output_dir)
@@ -87,7 +93,7 @@ def train():
         image = Image.open('{}/{}'.format(im_dir, im_id))
         image.load()
         density_path = gt_dir + '/' + im_id.split(".jpg")[0] + ".npy"
-        density = np.load(density_path).astype('float32')    
+        density = np.load(density_path).astype('float32')
         sample = {'image':image,'lines_boxes':rects,'gt_density':density}
         sample = TransformTrain(sample)
         image, boxes,gt_density = sample['image'].cuda(), sample['boxes'].cuda(),sample['gt_density'].cuda()
@@ -122,7 +128,7 @@ def train():
 
 
 
-   
+
 def eval():
     cnt = 0
     SAE = 0 # sum of absolute errors
@@ -178,7 +184,7 @@ for epoch in range(0,args.epochs):
     stats_file = join(args.output_dir, "stats" +  ".txt")
     with open(stats_file, 'w') as f:
         for s in stats:
-            f.write("%s\n" % ','.join([str(x) for x in s]))    
+            f.write("%s\n" % ','.join([str(x) for x in s]))
     if best_mae >= val_mae:
         best_mae = val_mae
         best_rmse = val_rmse
@@ -187,8 +193,3 @@ for epoch in range(0,args.epochs):
 
     print("Epoch {}, Avg. Epoch Loss: {} Train MAE: {} Train RMSE: {} Val MAE: {} Val RMSE: {} Best Val MAE: {} Best Val RMSE: {} ".format(
               epoch+1,  stats[-1][0], stats[-1][1], stats[-1][2], stats[-1][3], stats[-1][4], best_mae, best_rmse))
-    
-
-
-
-
