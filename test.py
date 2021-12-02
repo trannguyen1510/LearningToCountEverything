@@ -76,7 +76,7 @@ error_id = []
 logging.basicConfig(filename="logfilename.log", level=logging.INFO)
 
 for im_id in pbar:
-    try: {
+    try:
         anno = annotations[im_id]
         bboxes = anno['box_examples_coordinates']
         dots = np.array(anno['points'])
@@ -130,11 +130,9 @@ for im_id in pbar:
         pbar.set_description('{:<8}: actual-predicted: {:6d}, {:6.1f}, error: {:6.1f}. Current MAE: {:5.2f}, RMSE: {:5.2f}'.\
                              format(im_id, gt_cnt, pred_cnt, abs(pred_cnt - gt_cnt), SAE/cnt, (SSE/cnt)**0.5))
         print("")
-    }
-    except: {
+    except:
         error_id.append(im_id)
         logging.error(im_id)
-    }
 
 
 print('On {} data, MAE: {:6.2f}, RMSE: {:6.2f}'.format(args.test_split, SAE/cnt, (SSE/cnt)**0.5))
