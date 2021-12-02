@@ -76,7 +76,7 @@ error_id = []
 logging.basicConfig(filename="logfilename.log", level=logging.INFO)
 
 for im_id in pbar:
-    try {
+    try: {
         anno = annotations[im_id]
         bboxes = anno['box_examples_coordinates']
         dots = np.array(anno['points'])
@@ -131,7 +131,7 @@ for im_id in pbar:
                              format(im_id, gt_cnt, pred_cnt, abs(pred_cnt - gt_cnt), SAE/cnt, (SSE/cnt)**0.5))
         print("")
     }
-    except {
+    except: {
         error_id.append(im_id)
         logging.error(im_id)
     }
