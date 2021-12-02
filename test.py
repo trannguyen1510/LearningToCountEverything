@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""
-Test code written by Viresh Ranjan
-
-Last modified by: Minh Hoai Nguyen (minhhoai@cs.stonybrook.edu)
-Date: 2021/04/19
-"""
-
 import copy
 from model import CountRegressor, Resnet50FPN
 from utils import MAPS, Scales, Transform, extract_features
@@ -21,6 +14,7 @@ import numpy as np
 from tqdm import tqdm
 from os.path import exists
 import torch.optim as optim
+import logging
 
 
 parser = argparse.ArgumentParser(description="Few Shot Counting Evaluation code")
@@ -77,59 +71,72 @@ SSE = 0  # sum of square errors
 print("Evaluation on {} data".format(args.test_split))
 im_ids = data_split[args.test_split]
 pbar = tqdm(im_ids)
+
+error_id = []
+logging.basicConfig(filename="logfilename.log", level=logging.INFO)
+
 for im_id in pbar:
-    anno = annotations[im_id]
-    bboxes = anno['box_examples_coordinates']
-    dots = np.array(anno['points'])
+    try {
+        anno = annotations[im_id]
+        bboxes = anno['box_examples_coordinates']
+        dots = np.array(anno['points'])
 
-    rects = list()
-    for bbox in bboxes:
-        x1, y1 = bbox[0][0], bbox[0][1]
-        x2, y2 = bbox[2][0], bbox[2][1]
-        rects.append([y1, x1, y2, x2])
+        rects = list()
+        for bbox in bboxes:
+            x1, y1 = bbox[0][0], bbox[0][1]
+            x2, y2 = bbox[2][0], bbox[2][1]
+            rects.append([y1, x1, y2, x2])
 
-    image = Image.open('{}/{}'.format(im_dir, im_id))
-    image.load()
-    sample = {'image': image, 'lines_boxes': rects}
-    sample = Transform(sample)
-    image, boxes = sample['image'], sample['boxes']
+        image = Image.open('{}/{}'.format(im_dir, im_id))
+        image.load()
+        sample = {'image': image, 'lines_boxes': rects}
+        sample = Transform(sample)
+        image, boxes = sample['image'], sample['boxes']
 
-    if use_gpu:
-        image = image.cuda()
-        boxes = boxes.cuda()
+        if use_gpu:
+            image = image.cuda()
+            boxes = boxes.cuda()
 
-    with torch.no_grad(): features = extract_features(resnet50_conv, image.unsqueeze(0), boxes.unsqueeze(0), MAPS, Scales)
+        with torch.no_grad(): features = extract_features(resnet50_conv, image.unsqueeze(0), boxes.unsqueeze(0), MAPS, Scales)
 
-    if not args.adapt:
-        with torch.no_grad(): output = regressor(features)
-    else:
-        features.required_grad = True
-        adapted_regressor = copy.deepcopy(regressor)
-        adapted_regressor.train()
-        optimizer = optim.Adam(adapted_regressor.parameters(), lr=args.learning_rate)
-        for step in range(0, args.gradient_steps):
-            optimizer.zero_grad()
+        if not args.adapt:
+            with torch.no_grad(): output = regressor(features)
+        else:
+            features.required_grad = True
+            adapted_regressor = copy.deepcopy(regressor)
+            adapted_regressor.train()
+            optimizer = optim.Adam(adapted_regressor.parameters(), lr=args.learning_rate)
+            for step in range(0, args.gradient_steps):
+                optimizer.zero_grad()
+                output = adapted_regressor(features)
+                lCount = args.weight_mincount * MincountLoss(output, boxes)
+                lPerturbation = args.weight_perturbation * PerturbationLoss(output, boxes, sigma=8)
+                Loss = lCount + lPerturbation
+                # loss can become zero in some cases, where loss is a 0 valued scalar and not a tensor
+                # So Perform gradient descent only for non zero cases
+                if torch.is_tensor(Loss):
+                    Loss.backward()
+                    optimizer.step()
+            features.required_grad = False
             output = adapted_regressor(features)
-            lCount = args.weight_mincount * MincountLoss(output, boxes)
-            lPerturbation = args.weight_perturbation * PerturbationLoss(output, boxes, sigma=8)
-            Loss = lCount + lPerturbation
-            # loss can become zero in some cases, where loss is a 0 valued scalar and not a tensor
-            # So Perform gradient descent only for non zero cases
-            if torch.is_tensor(Loss):
-                Loss.backward()
-                optimizer.step()
-        features.required_grad = False
-        output = adapted_regressor(features)
 
-    gt_cnt = dots.shape[0]
-    pred_cnt = output.sum().item()
-    cnt = cnt + 1
-    err = abs(gt_cnt - pred_cnt)
-    SAE += err
-    SSE += err**2
+        gt_cnt = dots.shape[0]
+        pred_cnt = output.sum().item()
+        cnt = cnt + 1
+        err = abs(gt_cnt - pred_cnt)
+        SAE += err
+        SSE += err**2
 
-    pbar.set_description('{:<8}: actual-predicted: {:6d}, {:6.1f}, error: {:6.1f}. Current MAE: {:5.2f}, RMSE: {:5.2f}'.\
-                         format(im_id, gt_cnt, pred_cnt, abs(pred_cnt - gt_cnt), SAE/cnt, (SSE/cnt)**0.5))
-    print("")
+        pbar.set_description('{:<8}: actual-predicted: {:6d}, {:6.1f}, error: {:6.1f}. Current MAE: {:5.2f}, RMSE: {:5.2f}'.\
+                             format(im_id, gt_cnt, pred_cnt, abs(pred_cnt - gt_cnt), SAE/cnt, (SSE/cnt)**0.5))
+        print("")
+    }
+    except {
+        error_id.append(im_id)
+        logging.error(im_id)
+    }
+
 
 print('On {} data, MAE: {:6.2f}, RMSE: {:6.2f}'.format(args.test_split, SAE/cnt, (SSE/cnt)**0.5))
+
+print('Error file:', len(error_id))

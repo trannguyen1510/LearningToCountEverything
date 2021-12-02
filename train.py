@@ -1,10 +1,3 @@
-"""
-Training Code for Learning To Count Everything, CVPR 2021
-Authors: Viresh Ranjan,Udbhav, Thu Nguyen, Minh Hoai
-
-Last modified by: Minh Hoai Nguyen (minhhoai@cs.stonybrook.edu)
-Date: 2021/04/19
-"""
 import torch.nn as nn
 from model import  Resnet50FPN,CountRegressor,weights_normal_init
 from utils import MAPS, Scales, Transform,TransformTrain,extract_features, visualize_output_and_save
@@ -34,17 +27,17 @@ parser.add_argument("-lr", "--learning-rate", type=float,default=1e-5, help="lea
 args = parser.parse_args()
 
 
-# data_path = args.data_path
-# anno_file = data_path + 'annotation_FSC147_384.json'
-# data_split_file = data_path + 'Train_Test_Val_FSC_147.json'
-# im_dir = data_path + 'images_384_VarV2'
-# gt_dir = data_path + 'gt_density_map_adaptive_384_VarV2'
-
 data_path = args.data_path
-anno_file = os.path.join(data_path, 'annotation.json')
-data_split_file = data_path + 'Train_Test_Val.json'
-im_dir = data_path + 'image'
-gt_dir = os.path.join(data_path, 'den')
+anno_file = data_path + 'annotation_FSC147_384.json'
+data_split_file = data_path + 'Train_Test_Val_FSC_147.json'
+im_dir = data_path + 'images_384_VarV2'
+gt_dir = data_path + 'gt_density_map_adaptive_384_VarV2'
+
+# data_path = args.data_path
+# anno_file = os.path.join(data_path, 'annotation.json')
+# data_split_file = data_path + 'Train_Test_Val.json'
+# im_dir = data_path + 'image'
+# gt_dir = os.path.join(data_path, 'den')
 
 if not exists(args.output_dir):
     os.mkdir(args.output_dir)

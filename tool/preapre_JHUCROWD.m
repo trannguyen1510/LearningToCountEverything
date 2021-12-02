@@ -5,9 +5,9 @@
 clc; clear all;
 maxSize = [2048,2048];
 minSize = [512,512];
-mode = 'train';
-path ='D:/Files/Dataset/FSCount/jhu_crowd_v2.0/';
-output_path = strcat('D:/Files/Dataset/FSCount/jhu_crowd_v2.0_processed/', mode);
+mode = 'test';
+path ='D:/Files/Dataset/FSCount/Other/jhu_crowd_v2.0/';
+output_path = strcat('D:/Files/Dataset/FSCount/Other/jhu_crowd_v2.0_processed/', mode);
 train_path_img = strcat(output_path,'/', 'img/');
 train_path_den = strcat(output_path,'/', 'den/');
 train_path_gt= strcat(output_path,'/', 'gt/');
