@@ -3,3 +3,8 @@ __pycache__/
 */__pycache__/
 .idea
 
+# Folder
+test/anno/
+test/den/
+test/images_384_VarV2/
+
