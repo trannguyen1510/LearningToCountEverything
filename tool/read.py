@@ -38,6 +38,7 @@ img = 'img'
 #         if text.strip() == '':
 #             print(file)
 
+#-------------------------------------------------
 ## Check missing gt filePath
 # testPath = os.path.join(dataPath, test)
 # imgTestPath = os.path.join(testPath, img)
@@ -49,6 +50,7 @@ img = 'img'
 #         continue
 #     print(missingFilePath)
 
+#-------------------------------------------------
 ## Conver npy file to csv
 # list = os.listdir(denPath)
 # filePath = os.path.join(denPath, list[1])
@@ -65,6 +67,7 @@ img = 'img'
 #             elif col < data.shape[0]-1:
 #                 f.write('\n')
 
+#-------------------------------------------------
 ## Convert csv to npy file
 # denSamplePath = r'D:\Files\Dataset\FSCount\Other\SampleDataset\den'
 #
@@ -87,6 +90,7 @@ img = 'img'
 #     savePath = os.path.join(denPath, filename)
 #     np.save(savePath+'.npy', npy_file)
 
+#-------------------------------------------------
 ## Reformat
 sampleDataset += '\\'
 anno_file = sampleDataset + 'annotation_FSC147_384.json'
@@ -172,6 +176,7 @@ anno_dir = sampleDataset + 'anno'
 #     dict["val"] = []
 #     json.dump(dict, file)
 
+#-------------------------------------------------
 ## Remove file
 # with open(anno_file, 'r+') as file:
 #      anno_json = json.load(file)
@@ -193,7 +198,12 @@ anno_dir = sampleDataset + 'anno'
 #     anno_json = json.load(file)
 #     print(len(anno_json))
 
-import logging
+#-------------------------------------------------
+## Write log file
+# import logging
+#
+# logging.basicConfig(filename="logfilename.log", level=logging.INFO)
+# logging.error('your text goes here')
 
-logging.basicConfig(filename="logfilename.log", level=logging.INFO)
-logging.error('your text goes here')
+#-------------------------------------------------
+# Get box for demo
