@@ -82,7 +82,7 @@ else:
 print("Bounding boxes: ", end="")
 print(rects1)
 
-# quit()
+quit()
 
 image = Image.open(args.input_image)
 image.load()
